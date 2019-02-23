@@ -1,0 +1,86 @@
+$modal-background-color: #4b4b4b;
+$modal-selection-color: orange;
+$primary-color: rgb(182, 118, 0);
+$breakpoint-lg: 768px;
+$breakpoint-xlg: 1420px;
+$filter-text-color: #e2e2e2;
+
+.multiselect {
+  font-size: 15px;
+
+  &:hover {
+    background-color: darken($modal-background-color, 5%);
+  }
+}
+
+.multiselect__tags {
+  background: transparent;
+  border-radius: 0;
+  border: 1px solid orange;
+  padding: 10px 40px 0 10px;
+  height: 100%;
+}
+
+.multiselect__tag {
+  background: gray;
+}
+
+.multiselect__tag-icon {
+  &:hover, &:focus {
+    background: $primary-color;
+  }
+
+  &:after {
+    color: white;
+  }
+}
+
+.multiselect__placeholder {
+  font-size: 15px;
+  color: $filter-text-color;
+}
+
+.multiselect__input {
+  background: transparent;
+  font-size: 15px;
+  caret-color: $filter-text-color;
+  color: $filter-text-color;
+  padding: 0;
+
+  &::placeholder {
+    color: $filter-text-color;
+  }
+
+  &:focus {
+    border-color: transparent;
+  }
+}
+
+.multiselect__content-wrapper {
+  background: $modal-background-color;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-color: $primary-color;
+}
+
+.multiselect__option {
+  color: $filter-text-color;
+}
+
+.multiselect__option--highlight {
+  background: $primary-color;
+
+  &:after {
+    background: $primary-color;
+  }
+}
+
+.multiselect__option--selected {
+  background: gray;
+}
+
+.multiselect__single {
+  background: transparent;
+  color: $filter-text-color;
+  font-size: 15px;
+}
