@@ -68,202 +68,13 @@
 </div>
 </template>
 
-<style lang="scss">
-$breakpoint-lg: 992px;
-$breakpoint-xlg: 1400px;
-
-.main-header-wrapper {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-
-  @media(min-width: $breakpoint-lg) {
-    padding: 20px;
-  }
-}
-
-.not-playbook-message {
-  padding: 10px;
-
-  @media(min-width: $breakpoint-lg) {
-    padding: 20px;
-  }
-}
-
-.main-header {
-  margin: 0;
-  font-size: 1.2em;
-
-  @media(min-width: $breakpoint-xlg) {
-    font-size: 1.5em;
-  }
-}
-
-.back-to-db-editor {
-  color: #0b7abf;
-  cursor: pointer;
-
-  &:hover {
-    color: darken(#0b7abf, 15%);
-  }
-}
-
-.tables-wrapper {
-  padding: 10px;
-  display: grid;
-  grid-template-rows: 1fr 1fr 1fr 1fr;
-  grid-template-columns: minmax(175px, 1fr) minmax(175px, 1fr) 1fr 1fr;
-  grid-gap: 10px;
-  height: calc(100vh - 45px);
-  background: #eee;
-
-  @media(min-width: $breakpoint-lg) {
-    padding: 20px;
-    grid-gap: 20px;
-    height: calc(100vh - 65px);
-  }
-
-  @media(min-width: $breakpoint-xlg) {
-    height: calc(100vh - 72px);
-  }
-}
-
-.span-all-rows {
-  grid-row-start: span 4;
-  
-  .table {
-    max-height: calc(100% - 31px);
-    overflow-y: auto;
-  }
-}
-
-.poso-table-wrapper {
-  grid-row-start: span 2;
-
-  .table {
-    display: grid;
-    grid-template-columns: 1fr;
-    max-height: calc(100% - 31px);
-    overflow-y: auto;
-
-    @media(min-width: $breakpoint-xlg) {
-      grid-template-columns: 1fr 1fr;
-      grid-gap: 5px;
-    }
-
-    .table-item {
-      + .table-item {
-        @media(min-width: $breakpoint-xlg) {
-          border-top: 1px solid #d1d1d1; 
-        }
-      }
-    }
-  }
-}
-
-.playbook-view-wrapper {
-  .loader-wrapper {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 1040;
-  }
-
-  .underlay {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: rgba(0, 0, 0, 0.15);
-  }
-}
-
-.loader,
-.loader:after {
-  border-radius: 50%;
-  width: 10em;
-  height: 10em;
-}
-.loader {
-  position: absolute;
-  top: calc(50% - 75px);
-  margin: 0 auto;
-  font-size: 10px;
-  position: relative;
-  text-indent: -9999em;
-  border-top: 1.1em solid rgba(0, 0, 0, 0.1);
-  border-right: 1.1em solid rgba(0, 0, 0, 0.1);
-  border-bottom: 1.1em solid rgba(0, 0, 0, 0.1);
-  border-left: 1.1em solid #e98819;
-  -webkit-transform: translateZ(0);
-  -ms-transform: translateZ(0);
-  transform: translateZ(0);
-  -webkit-animation: load8 1.1s infinite linear;
-  animation: load8 1.1s infinite linear;
-}
-@-webkit-keyframes load8 {
-  0% {
-    -webkit-transform: rotate(0deg);
-    transform: rotate(0deg);
-  }
-  100% {
-    -webkit-transform: rotate(360deg);
-    transform: rotate(360deg);
-  }
-}
-@keyframes load8 {
-  0% {
-    -webkit-transform: rotate(0deg);
-    transform: rotate(0deg);
-  }
-  100% {
-    -webkit-transform: rotate(360deg);
-    transform: rotate(360deg);
-  }
-}
-
-.table-wrapper {
-  padding: 10px;
-  background: #fbfbfb;
-
-  @media(min-width: $breakpoint-lg) {
-    padding: 20px;
-  }
-}
-
-.table-header {
-  margin: 0 0 10px 0;
-}
-
-.table-item {
-  padding: 10px;
-  font-size: 0.867em;
-  border: 1px solid #d1d1d1;
-
-  @media(min-width: $breakpoint-xlg) {
-    padding: 15px;
-    font-size: 1em;
-  }
-  
-  &:hover, &.active {
-    background: #d1d1d1;
-    cursor: pointer;
-  }
-
-  + .table-item {
-    border-top: none;
-  }
-}
-</style>
+<style src='../assets/madden-playbook-view.scss'></style>
 
 <script>
 import PositionData from '../utils/PositionData';
 import fs from 'fs';
 import TempDbUtil from '../utils/TempDbUtil';
+import formationsTable from '../utils/FORM';
 
 export default {
   name: 'MaddenPlaybookView',
@@ -294,7 +105,7 @@ export default {
 
       if (fileLoaded && this.isPlaybook) {
         this.parseTable('SETL', 'setTable');
-        this.parseTableFromFile('static/FORM.json', 'formationsTable');
+        // this.parseTableFromFile('../utils/FORM.js', 'formationsTable');
         this.parseTable('PBPL', 'pbplTable');
         this.parseTable('PLYS', 'plysTable');
         this.parseTable('PLRD', 'plrdTable');
@@ -323,7 +134,7 @@ export default {
   },
 
   setTable: null,
-  formationsTable: null,
+  formationsTable: formationsTable,
   plysTable: null,
   pbplTable: null,
   plrdTable: null,

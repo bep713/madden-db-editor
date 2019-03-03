@@ -21,148 +21,7 @@
 </template>
 
 <style src="../../../node_modules/handsontable/dist/handsontable.full.css"></style>
-
-<style>
-  .madden-table-data-wrapper {
-    height: 100%;
-    width: 100%;
-  }
-
-  .hot-table {
-    font-size: 15px;
-  }
-
-  td.active-row {
-    background-color: #f1f1f1;
-  }
-
-  .empty-message {
-    padding-left: 20px;
-  }
-
-  .empty-message + .hot-table {
-    visibility: hidden;
-  }
-
-  .hot-table * {
-    box-sizing: initial;
-  }
-
-  .notes-input-wrapper {
-    position: absolute;
-    z-index: 200;
-    background: #e2e2e2;
-    padding: 10px;
-    border: 1px solid black;
-  }
-
-  .notes-header {
-    margin-bottom: 10px;
-  }
-
-  .notes-input {
-    font-family: 'Roboto Mono';
-    height: 30px;
-    font-size: 15px;
-    padding-left: 5px;
-  }
-
-  .btn-save-input {
-    font-family: 'Roboto Mono';
-    height: 30px;
-    margin-left: 10px;
-  }
-
-  .close-icon {
-    position: absolute;
-    top: 0;
-    right: 0;
-    cursor: pointer;
-    padding: 4px 7px;
-  }
-
-  .inputs-wrapper {
-    display: flex;
-  }
-
-  .htCommentTextArea {
-    font-size: 15px;
-    font-family: 'Roboto Mono';
-    height: 80px;
-    width: 240px;
-  }
-
-  .loader-wrapper {
-    position: absolute;
-    top: 0;
-    bottom: 70px;
-    left: 0;
-    right: 0;
-    z-index: 1040;
-  }
-
-  .underlay {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: rgba(0, 0, 0, 0.15);
-  }
-
-  .loader,
-  .loader:after {
-    border-radius: 50%;
-    width: 10em;
-    height: 10em;
-  }
-  .loader {
-    position: absolute;
-    top: calc(50% - 75px);
-    margin: 0 auto;
-    font-size: 10px;
-    position: relative;
-    text-indent: -9999em;
-    border-top: 1.1em solid rgba(0, 0, 0, 0.1);
-    border-right: 1.1em solid rgba(0, 0, 0, 0.1);
-    border-bottom: 1.1em solid rgba(0, 0, 0, 0.1);
-    border-left: 1.1em solid #e98819;
-    -webkit-transform: translateZ(0);
-    -ms-transform: translateZ(0);
-    transform: translateZ(0);
-    -webkit-animation: load8 1.1s infinite linear;
-    animation: load8 1.1s infinite linear;
-  }
-  @-webkit-keyframes load8 {
-    0% {
-      -webkit-transform: rotate(0deg);
-      transform: rotate(0deg);
-    }
-    100% {
-      -webkit-transform: rotate(360deg);
-      transform: rotate(360deg);
-    }
-  }
-  @keyframes load8 {
-    0% {
-      -webkit-transform: rotate(0deg);
-      transform: rotate(0deg);
-    }
-    100% {
-      -webkit-transform: rotate(360deg);
-      transform: rotate(360deg);
-    }
-  }
-
-  .hide {
-    display: none;
-  }
-
-  .soft-hide {
-    pointer-events: none;
-    opacity: 0;
-  }
-</style>
+<style src="../assets/madden-table-data.css"></style>
 
 <script>
 import Vue from 'vue';
@@ -173,7 +32,7 @@ import { ipcRenderer } from 'electron';
 import HexReader from '../utils/HexReader';
 import FieldTypes from '../utils/FieldTypeEnum';
 import FilterOperatorEnum from '../utils/FilterOperatorEnum';
-import TempDbReader from '../utils/TempDbUtil';
+import TempDbUtil from '../utils/TempDbUtil';
 
 import path from 'path';
 import fs from 'fs';
@@ -437,7 +296,7 @@ export default {
         this.showLoadingSpinner(true);
 
         setTimeout(function () {
-          this.$options.tableData = TempDbReader.getTable(data);
+          this.$options.tableData = TempDbUtil.getTable(data);
           this.tableHasData = this.$options.tableData && this.$options.tableData.fields[0].records.length > 0;
           this.setTableData(this.$options.tableData, true);
         }.bind(this), 10);
@@ -704,7 +563,7 @@ export default {
           changes: fileChanges
         });
 
-        // this.$emit('cellsChanged', changesWithMeta);
+        TempDbUtil.writeTable(this.selectedTable, this.$options.tableData);
       }
     },
 

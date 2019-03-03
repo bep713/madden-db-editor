@@ -8,6 +8,10 @@ export default {
     return JSON.parse(tableDataString);
   },
 
+  writeTable: function (tableName, tableData) {
+    fs.writeFileSync(`${tempDbPath}/${tableName}.json`, JSON.stringify(tableData));
+  },
+
   fileIsPlaybook: function () {
     const playbookTablesToCheck = ['PBPL', 'SETL', 'PLYS']
     const dirContents = fs.readdirSync(tempDbPath);

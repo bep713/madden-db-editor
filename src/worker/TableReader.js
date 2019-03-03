@@ -215,7 +215,7 @@ function readString (recordData, field) {
 };
 
 function readBytes (recordData, field) {
-  bytes = [];
+  let bytes = [];
 
   for (let i = 0; i < (field.bits/8); i++) {
     bytes[i] = recordData[(field.offset/8) + i];

@@ -1,6 +1,7 @@
 import { ipcRenderer } from 'electron';
 import TableReader from './TableReader';
 import TableWriter from './TableWriter';
+import TempDbUtil from '../renderer/utils/TempDbUtil';
 import path from 'path';
 import fs from 'fs';
 
@@ -11,9 +12,9 @@ let tableWriter = new TableWriter();
 registerTableWriterListeners(tableWriter);
 
 const tempDbPath = 'temp/formatted/db';
+const backupPath = 'temp/backup';
 
 let currentFile;
-// let tables = [];
 
 ipcRenderer.on('load-file', function (event, arg) {
   console.time('read');
@@ -25,13 +26,30 @@ ipcRenderer.on('load-file', function (event, arg) {
       tables: []
     };
 
-    // tables = [];
+    if (!fs.existsSync(tempDbPath)) {
+      if (!fs.existsSync('temp')) {
+        fs.mkdirSync('temp');
+      }
+
+      if (!fs.existsSync('temp/formatted')) {
+        fs.mkdirSync('temp/formatted');
+      }
+
+      if (!fs.existsSync('temp/formatted/db')) {
+        fs.mkdirSync('temp/formatted/db');
+      }
+
+      if (!fs.existsSync('temp/backup')) {
+        fs.mkdirSync('temp/backup');
+      }
+    }
 
     const dirContents = fs.readdirSync(tempDbPath);
     for(const file of dirContents) {
       fs.unlinkSync(path.join(tempDbPath, file));
     }
 
+    makeBackupOfFile(arg);
     tableReader.readTablesInFile(arg);
   }
   catch (err) {
@@ -68,6 +86,10 @@ ipcRenderer.on('get-table-data', function (event, arg) {
   ipcRenderer.send('table-data', table);
 });
 
+ipcRenderer.on('restore', function (event, arg) {
+  console.log('restoring');
+});
+
 function registerTableReaderListeners(tableReader) {
   tableReader.on('raw-file', (data) => {
     currentFile.buffer = data;
@@ -99,7 +121,8 @@ function registerTableReaderListeners(tableReader) {
   // });
 
   tableReader.on('table-done', (table) => {
-    fs.writeFileSync(`${tempDbPath}/${table.tableName}.json`, JSON.stringify(table.tableData));
+    TempDbUtil.writeTable(table.tableName, table.tableData);
+    // fs.writeFileSync(`${tempDbPath}/${table.tableName}.json`, JSON.stringify(table.tableData));
     ipcRenderer.send('table-done', table.tableName);
   });
 
@@ -113,4 +136,37 @@ function registerTableWriterListeners(tableWriter) {
   tableWriter.on('write-done', () => {
     ipcRenderer.send('write-done');
   });
+};
+
+function makeBackupOfFile(arg) {
+  const fileName = arg.substring(arg.lastIndexOf('\\') + 1);
+  copyFile(arg, `${backupPath}/backup.db`, function (err) {
+    if (err) {
+      console.log(err);
+    }
+  });
+};
+
+function copyFile(source, target, cb) {
+  var cbCalled = false;
+
+  var rd = fs.createReadStream(source);
+  rd.on("error", function(err) {
+    done(err);
+  });
+  var wr = fs.createWriteStream(target);
+  wr.on("error", function(err) {
+    done(err);
+  });
+  wr.on("close", function(ex) {
+    done();
+  });
+  rd.pipe(wr);
+
+  function done(err) {
+    if (!cbCalled) {
+      cb(err);
+      cbCalled = true;
+    }
+  }
 };

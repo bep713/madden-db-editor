@@ -12,6 +12,12 @@ const template = [
         accelerator: 'CmdOrCtrl+O',
         click: fileHelper.openFileWindow
       },
+      // {
+      //   id: 'Restore',
+      //   label: 'Restore',
+      //   click: fileHelper.restore,
+      //   enabled: false
+      // },
       {
         id: 'Save',
         label: 'Save',

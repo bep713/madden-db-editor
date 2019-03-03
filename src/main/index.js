@@ -25,7 +25,7 @@ const baseWindowTitle = 'Madden DB Editor';
 let currentFilePath = '';
 let resetTitle;
 
-let menuItemIdsDependentOnFileLoaded = ['CloseFile', 'Undo', 'Redo', 'RevealInExplorer', 'ShowFilterWindow', 'ClearFilters', 'ShowPlaybookView'];
+let menuItemIdsDependentOnFileLoaded = ['CloseFile', 'Undo', 'Redo', 'RevealInExplorer', 'ShowFilterWindow', 'ClearFilters', 'ShowPlaybookView', 'Restore'];
 let menuItemIdsForSave = ['Save', 'SaveAs'];
 
 function createWindow () {
@@ -221,6 +221,10 @@ function addIpcListeners() {
     if (currentFilePath) {
       shell.showItemInFolder(currentFilePath);
     }
+  });
+
+  ipcMain.on('restore', function (event, arg) {
+    workerWindow.webContents.send('restore');
   });
 };
 

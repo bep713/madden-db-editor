@@ -37,202 +37,13 @@
 
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 <style src="../assets/multiselect-overrides.scss"></style>
-
-<style lang="scss">
-  $modal-background-color: #4b4b4b;
-  $modal-selection-color: orange;
-  $primary-color: rgb(182, 118, 0);
-  $breakpoint-md: 768px;
-  $breakpoint-lg: 992px;
-  $breakpoint-xlg: 1420px;
-  $filter-text-color: #e2e2e2;
-  $active-filters-primary-color: gray;
-
-  .filter-modal {
-    display: flex;
-    flex-direction: column;
-    color: $filter-text-color;
-
-    .hover-show-background {
-      background-color: $modal-background-color;
-      padding: 10px;
-      margin: 0;
-      text-align: center;
-      
-      @media(min-width: $breakpoint-lg) {
-        margin: 20px 100px -20px 100px;
-        padding: 20px;
-      }
-
-      @media(min-width: $breakpoint-xlg) {
-        margin-top: 20px;
-      }
-
-      &:hover {
-        opacity: 0.2;
-
-        + .modal-main {
-          opacity: 0;
-
-          &:hover {
-            opacity: 1;
-          }
-        }
-      }
-    }
-
-    .modal-help-text {
-      font-weight: 500;
-      margin-top: 0;
-    }
-  }
-
-  .filter-action-bar {
-    margin: 10px 0 15px 0;
-  }
-
-  .action-item {
-    border: 1px solid orange;
-    background-color: transparent;
-    color: $filter-text-color;
-    padding: 5px 15px;
-    cursor: pointer;
-    margin: 0 5px 5px 0;
-
-    &:hover, &:focus {
-      background-color: darken($modal-background-color, 5%);
-    }
-
-    &:focus {
-      outline: #ffffff auto 10px;
-      border: 1px solid #ffffff;
-    }
-
-    &:last-child {
-      margin-right: 0;
-    }
-  }
-
-  .filter-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr minmax(100px, 1fr);
-    grid-template-rows: 1fr 1fr;
-    grid-row-gap: 5px;
-    grid-column-gap: 5px;
-
-    @media(min-width: $breakpoint-xlg) {
-      grid-template-columns: 1fr 1fr 1.5fr 2.5fr 1fr;
-      grid-template-rows: 1fr;
-      grid-column-gap: 10px;
-      grid-row-gap: 10px;
-    }
-
-    +.filter-grid {
-      margin-top: 20px;
-      padding-top: 20px;
-      border-top: 1px solid orange;
-
-      @media(min-width: $breakpoint-xlg) {
-        margin-top: 10px;
-        border-top: none;
-        padding-top: 0;
-      }
-    }
-  }
-
-  .active-filters {
-    .multiselect__tags {
-      border: 1px solid $active-filters-primary-color
-    }
-
-    .multiselect__content-wrapper {
-      border-color: $active-filters-primary-color;
-    }
-  }
-
-  .filter-input {
-    font-family: 'Roboto';
-    background: transparent;
-    border: 1px solid orange;
-    padding: 10px;
-    color: $filter-text-color;
-    font-size: 15px;
-
-    &:hover {
-      background: darken($modal-background-color, 5%);
-    }
-
-    &:focus {
-      outline: #ffffff auto 10px;
-      border: 1px solid #ffffff;
-    }
-
-    &.filter-value-input {
-      padding: 5px 5px 5px 15px;
-    }
-
-    &.filter-button {
-      border-color: $primary-color;
-      background-color: $primary-color;
-      color: #FFF;
-      cursor: pointer;
-
-      &:hover {
-        background-color: darken($primary-color, 5%);
-      }
-    }
-
-    @at-root .active-filters #{&} {
-      border: 1px solid $active-filters-primary-color;
-
-      &.filter-button {
-        background-color: $modal-background-color;
-
-        &:hover {
-          background-color: darken($modal-background-color, 5%);
-        }
-      }
-    }
-
-    option {
-      background-color: $modal-background-color;
-    }
-  }
-
-  .active-filter-header {
-    margin-bottom: 10px;
-    font-weight: 500;
-  }
-
-  .filter-select-table {
-    grid-row: 2;
-    grid-column-start: span 3;
-
-    @media(min-width: $breakpoint-xlg) {
-      grid-row: auto;
-      grid-column-start: auto;
-    }
-  }
-
-  .add-filter-button, .remove-filter-button {
-    grid-row: 3;
-    grid-column-start: span 3;
-
-    @media(min-width: $breakpoint-xlg) {
-      grid-row: auto;
-      grid-column-start: auto;
-    }
-  }
-
-  .no-filter-added-text {
-    text-align: center;
-  }
-</style>
+<style src="../assets/madden-filter-selector-modal.scss"></style>
 
 <script>
 import Vue from 'vue';
 import Multiselect from 'vue-multiselect';
 import FieldTypeEnum from '../utils/FieldTypeEnum';
+import TempDbUtil from '../utils/TempDbUtil';
 import fs from 'fs';
 
 export default {
@@ -261,8 +72,7 @@ export default {
     allColumnOptions: function () {
       let selectedTableColumns = [];
 
-      const tableString = fs.readFileSync(`temp/${this.selectedTable}.json`);
-      this.$options.tableData = JSON.parse(tableString);
+      this.$options.tableData = TempDbUtil.getTable(this.selectedTable);
 
       this.$options.tableData.fields.forEach((field) => {
         selectedTableColumns.push(field.name);

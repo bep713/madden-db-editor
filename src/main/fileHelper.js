@@ -37,6 +37,19 @@ export default {
     });
 
     browserWindow.webContents.send('save', filePath);
+  },
+
+  restore: function (menuItem, browserWindow, event) {
+    let choice = dialog.showMessageBox(browserWindow, {
+      type: 'question',
+      buttons: ['Do not restore', 'Restore'],
+      title: 'Restore original file',
+      message: 'This can not be un-done. All saved changes will be lost from this session. The file will revert back to what it was when you opened it.'
+    });
+
+    if (choice === 1) {
+      browserWindow.webContents.send('restore');
+    }
   }
 }
 
