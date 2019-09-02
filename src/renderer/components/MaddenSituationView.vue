@@ -6,7 +6,10 @@
   </div>
   <div class="main-header-wrapper">
     <h2 class="main-header">Situation View</h2>
-    <div class="back-to-db-editor" v-on:click="onBackToDbEditorClick">Back to DB Editor</div>
+    <div class="action-links">
+      <div class="mass-editors action-link" v-on:click="onMassEditorsClicked">PRCT Global Editor</div>
+      <div class="back-to-db-editor action-link" v-on:click="onBackToDbEditorClick">Back to DB Editor</div>
+    </div>
   </div>
   <div class="not-playbook-message" v-if="!isPlaybook">The selected file is not a recognized playbook file. To use this view, please open either a team playbook or a custom playbook.
   </div>
@@ -22,6 +25,8 @@
       <hot-table :settings="hotSettings" ref="hot"></hot-table>
     </div>
   </div>
+  <MaddenSituationMassEditorModal v-if="isMassEditModalOpen" v-bind:selectedSituation="selectedSituation.name" 
+    @closed="onMassEditorModalClosed" @prct-edit="onPrctEdit"></MaddenSituationMassEditorModal>
 </div>
 </template>
 
@@ -41,12 +46,14 @@ import TempDbUtil from '../utils/TempDbUtil';
 import FieldTypes from '../utils/FieldTypeEnum';
 import PlayTypeData from '../utils/PlayTypeData';
 import SituationData from '../utils/SituationData';
+import MaddenSituationMassEditorModal from './MaddenSituationMassEditorModal';
 
 export default {
   name: 'MaddenSituationView',
   props: ['resetPlaybookView', 'fileLoaded'],
   components: {
-    HotTable
+    HotTable,
+    MaddenSituationMassEditorModal
   },
   data () {
     return {
@@ -67,6 +74,7 @@ export default {
       artl: null,
       isPlaybook: true,
       isCustomPlaybook: false,
+      isMassEditModalOpen: false,
       hotMetadata: {
         'advancedPLYT': false,
         'columns': {
@@ -136,11 +144,13 @@ export default {
   mounted() {
     this.hotRef = this.$refs.hot.hotInstance;
     window.addEventListener('resize', this.onResize);
+    window.addEventListener('keydown', this.showMassEditor);
     this.onResize();
   },
 
   destroyed() {
     window.removeEventListener('resize', this.onResize);
+    window.removeEventListener('keydown', this.showMassEditor);
 
     if (this.$refs.hot) {
       this.$refs.hot.hotInstance.destroy();
@@ -462,6 +472,10 @@ export default {
       this.$emit('hide-situation-view');
     },
 
+    onMassEditorsClicked: function () {
+      this.isMassEditModalOpen = true;
+    },
+
     processChanges: function (changes) {
       if (!changes) { return; }
 
@@ -474,6 +488,9 @@ export default {
           case 'pbai.prct':
             column = this.$options.pbaiTable.fields.findIndex((field) => { return field.name === 'prct'; })
             break;
+          case 'pbai/prct':
+            column = this.$options.pbaiTable.fields.findIndex((field) => { return field.name === 'prct'; })
+            break;
         }
 
         return {
@@ -483,7 +500,58 @@ export default {
         };
       }.bind(this));
 
-      changesWithMeta.forEach((change) => {
+      this.save(changesWithMeta);
+    },
+
+    onMassEditorModalClosed: function () {
+      this.isMassEditModalOpen = false;
+    },
+
+    showMassEditor: function (e) {
+      if (e.key === 'e' && e.ctrlKey) {
+        this.onMassEditorsClicked();
+      }
+    },
+
+    onPrctEdit: function (data) {
+      this.onMassEditorModalClosed();
+
+      this.$refs.hot.hotInstance.updateSettings({
+        data: null
+      });
+
+      this.filteredPlays.forEach((play) => {
+        switch (play.pbai.plyt.name) {
+          case 'Pass':
+            play.pbai.prct = data.pass;
+            break;
+          case 'Run':
+            play.pbai.prct = data.run;
+            break;
+          case 'Play action':
+            play.pbai.prct = data.pa;
+            break;
+          case 'RPO':
+            play.pbai.prct = data.rpo;
+            break;
+        }
+      });
+
+      this.selectSituation(this.selectedSituation);
+
+      const changes = this.filteredPlays.map((play, index) => {
+        return {
+          'recordNumber': play.pbai.pbaiRecord,
+          'column': 7,
+          'value': play.pbai.prct
+        };
+      });
+
+      this.save(changes);
+    },
+
+    save: function (changes) {
+      changes.forEach((change) => {
         const field = this.$options.pbaiTable.fields[change.column];
 
         let value;
@@ -504,7 +572,7 @@ export default {
         this.$options.pbaiTable.fields[change.column].records[change.recordNumber].value = value;
       });
 
-      const fileChanges = changesWithMeta.map((change) => {
+      const fileChanges = changes.map((change) => {
         return {
           fieldType: this.$options.pbaiTable.fields[change.column].type,
           fieldOffset: this.$options.pbaiTable.fields[change.column].offset,

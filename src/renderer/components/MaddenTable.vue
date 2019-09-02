@@ -151,10 +151,16 @@ export default {
 
     ipcRenderer.on('show-situation-view', function (event, arg) {
       this.situationViewShown = !this.situationViewShown;
-      this.playbookViewShown = false;
 
-      if (this.fileLoaded) {
-        this.$refs.situationView.processFile();
+      if (this.situationViewShown) {
+        this.playbookViewShown = false;
+
+        if (this.fileLoaded) {
+          this.$refs.situationView.processFile();
+        }
+      }
+      else {
+        this.onHideSituationView();
       }
     }.bind(this));
 

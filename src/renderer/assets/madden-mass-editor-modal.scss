@@ -1,0 +1,122 @@
+$modal-background-color: #4b4b4b;
+$modal-selection-color: orange;
+$primary-color: rgb(182, 118, 0);
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+$breakpoint-xlg: 1420px;
+$filter-text-color: #e2e2e2;
+$active-filters-primary-color: gray;
+
+.mass-editor-modal {
+  font-family: 'Roboto', sans-serif;
+
+  .edit-text {
+    color: white;
+    margin-bottom: 20px;
+  }
+
+  .selected-situation {
+    text-transform: uppercase;
+    border-bottom: 1px solid white;
+  }
+
+  .modal-main {
+    max-width: 500px;
+    margin: 50px auto;
+  }
+
+  .modal-help-text {
+    font-weight: 500;
+    margin-top: 0;
+  }
+
+  .percent-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    grid-gap: 20px;
+  }
+
+  .percent {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .name {
+    color: white;
+    margin-bottom: 6px;
+  }
+
+  .percent-input-wrapper {
+    background-color: $modal-background-color;
+    border: 1px solid orange;
+    padding: 10px;
+    color: $filter-text-color;
+    font-size: 15px;
+
+    &:hover {
+      background-color: darken($modal-background-color, 5%);
+    }
+
+    .percent-input {
+      background-color: inherit;
+      height: 100%;
+      width: calc(100% - 20px);
+      border: none;
+      outline: none;
+      color: inherit;
+      font-size: inherit;
+    }
+  }
+
+  .footer-items {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+
+  .left-content {
+    color: white;
+    display: flex;
+    align-items: center;
+
+    label {
+      margin-left: 5px;
+    }
+  }
+
+  .button-wrapper {
+    display: flex;
+    justify-content: flex-end;
+
+    button {
+      padding: 10px;
+      cursor: pointer;
+
+      &.primary-button {
+        border: none;
+        background-color: $primary-color;
+        color: white;
+
+        &:hover {
+          background-color: darken($primary-color, 5%);
+        }
+      }
+
+      &.secondary-button {
+        border: 1px solid $primary-color;
+        background-color: inherit;
+        color: white;
+
+        &:hover {
+          background-color: darken($modal-background-color, 5%);
+        }
+      }
+
+      + button {
+        margin-left: 10px;
+      }
+    }
+  }
+}

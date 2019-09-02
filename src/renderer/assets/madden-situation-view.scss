@@ -11,4 +11,23 @@
   .set-table-wrapper {
     overflow: auto;
   }
+
+  .action-links {
+    display: flex;
+
+    div {
+      + div {
+        margin-left: 50px;
+      }
+    }
+
+    .action-link {
+      color: #0b7abf;
+      cursor: pointer;
+
+      &:hover {
+        color: darken(#0b7abf, 15%);
+      }
+    }
+  }
 }
