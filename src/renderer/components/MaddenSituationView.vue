@@ -39,6 +39,7 @@ import formationsTable from '../utils/FORM';
 import { HotTable } from '@handsontable/vue';
 import TempDbUtil from '../utils/TempDbUtil';
 import FieldTypes from '../utils/FieldTypeEnum';
+import PlayTypeData from '../utils/PlayTypeData';
 import SituationData from '../utils/SituationData';
 
 export default {
@@ -66,22 +67,56 @@ export default {
       artl: null,
       isPlaybook: true,
       isCustomPlaybook: false,
+      hotMetadata: {
+        'advancedPLYT': false,
+        'columns': {
+          'simplePlyt': [
+            { data: 'pbpl','readOnly': true },
+            { data: 'pbai.setl.name','readOnly': true },
+            { data: 'name','readOnly': true },
+            { data: 'pbai.plyt.name','readOnly': true },
+            { data: 'pbai.prct' }
+          ],
+          'advancedPlyt': [
+            { data: 'pbpl','readOnly': true },
+            { data: 'pbai.setl.name','readOnly': true },
+            { data: 'name','readOnly': true },
+            { data: 'pbai.plyt.id','readOnly': true },
+            { data: 'pbai.prct' }
+          ]
+        }
+      },
       hotSettings: {
         'manualColumnResize': true,
         'rowHeights': 25,
         'manualRowResize': true,
         'currentRowClassName': 'active-row',
         'columns': [
-          { data: 'pbpl', 'readOnly': true },
-          { data: 'pbai.setl.name', 'readOnly': true },
-          { data: 'name', 'readOnly': true },
+          { data: 'pbpl','readOnly': true },
+          { data: 'pbai.setl.name','readOnly': true },
+          { data: 'name','readOnly': true },
+          { data: 'pbai.plyt.name','readOnly': true },
           { data: 'pbai.prct' }
         ],
-        'colHeaders': ['pbpl', 'formation/set', 'play name', 'prct'],
-        'colWidths': [85, 300, 300, 75],
+        'colHeaders': ['pbpl', 'formation/set', 'play name', 'play type', 'prct'],
+        'colWidths': [85, 300, 300, 125, 75],
         'afterChange': this.processChanges,
-        'width': 780,
-        'columnSorting': true
+        'width': 910,
+        'columnSorting': true,
+        'contextMenu': {
+          'items': {
+            'advanced_plyt': {
+              'name': 'Toggle advanced play type',
+              'callback': function () {
+                this.advancedPLYT = !this.advancedPLYT;
+
+                this.$refs.hot.hotInstance.updateSettings({
+                  'columns': this.advancedPLYT === true ? this.hotMetadata.columns.advancedPlyt : this.hotMetadata.columns.simplePlyt
+                });
+              }.bind(this)
+            }
+          }
+        }
       }
     }
   },
@@ -162,9 +197,6 @@ export default {
         this.parseTable('SETL', 'setTable');
         this.parseTable('PBPL', 'pbplTable');
         this.parseTable('PBAI', 'pbaiTable');
-      // }
-        // this.parseTable('PLYS', 'plysTable');
-        // this.parseTable('PLRD', 'plrdTable');
 
         if (!this.isCustomPlaybook) {
           this.parseTable('PLYL', 'plylTable');
@@ -326,11 +358,22 @@ export default {
           return play.pbpl === pbpl;
         });
 
+        let plytValue = {
+          'name': '',
+          'id': plyt
+        };
+
+        const plytRecord = PlayTypeData.find((playType) => { return playType.plyt.includes(plyt); });
+
+        if (plytRecord) {
+          plytValue.name = plytRecord.name;
+        }
+
         play.pbaiData.push({
           'pbaiRecord': i,
           'setl': this.setNames.find((set) => { return set.setl === setl; }),
           'aigr': aigr,
-          'plyt': plyt,
+          'plyt': plytValue,
           'prct': prct
         });
       }
