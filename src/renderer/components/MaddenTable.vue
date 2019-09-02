@@ -3,12 +3,14 @@
     <div class="table-data" ref="tableData">
       <MaddenTableData v-bind:selectedTable="selectedTable" v-bind:deselectCell="deselectCell" v-bind:filters="allFilters"
         v-if="tables.length > 0" @cellsChanged="onCellsChanged" @new-filter-from-table-data="onTableDataFilterAdded" 
-        @remove-filter-from-table-data="onTableDataFilterRemoved" v-bind:class="{ 'soft-hide': playbookViewShown }"></MaddenTableData>
+        @remove-filter-from-table-data="onTableDataFilterRemoved" v-bind:class="{ 'soft-hide': playbookViewShown || situationViewShown }" ref="tableData"></MaddenTableData>
       <MaddenWelcome v-bind:recentFiles="recentFiles" v-show="tables.length === 0"></MaddenWelcome>
-      <MaddenPlaybookView class="madden-playbook-view" v-show="tables.length > 0 && playbookViewShown" :fileLoaded="fileLoaded"
+      <MaddenPlaybookView class="madden-playbook-view editor-view" v-show="tables.length > 0 && playbookViewShown && !situationViewShown" :fileLoaded="fileLoaded"
         :resetPlaybookView="resetPlaybookView" @hide-playbook-view="onHidePlaybookView"></MaddenPlaybookView>
+      <MaddenSituationView class="madden-situation-view editor-view" v-show="tables.length > 0 && situationViewShown && !playbookViewShown" :fileLoaded="fileLoaded"
+        @hide-situation-view="onHideSituationView" ref="situationView"></MaddenSituationView>
     </div>
-    <div class="header-tab-wrapper" v-if="!playbookViewShown">
+    <div class="header-tab-wrapper" v-if="!playbookViewShown && !situationViewShown">
       <div class="header-tab-content" ref="headerTabContent">
         <MaddenTableHeader v-for="table in tables" v-bind:key="table.definition.name" v-bind:table="table" @selected="selectTable(table)"
           v-bind:isActive="selectedTable && selectedTable === table.definition.name"></MaddenTableHeader>
@@ -31,6 +33,7 @@ import MaddenTableHeader from './MaddenTableHeader';
 import MaddenTableSelectorModal from './MaddenTableSelectorModal';
 import MaddenFilterSelectorModal from './MaddenFilterSelectorModal';
 import MaddenPlaybookView from './MaddenPlaybookView';
+import MaddenSituationView from './MaddenSituationView';
 
 import HexReader from '../utils/HexReader';
 import FieldTypes from '../utils/FieldTypeEnum';
@@ -43,6 +46,7 @@ export default {
     MaddenTableData: MaddenTableData,
     MaddenTableHeader: MaddenTableHeader,
     MaddenPlaybookView: MaddenPlaybookView,
+    MaddenSituationView: MaddenSituationView,
     MaddenTableSelectorModal: MaddenTableSelectorModal,
     MaddenFilterSelectorModal: MaddenFilterSelectorModal
   },
@@ -57,6 +61,7 @@ export default {
       fileLoadError: {},
       allFilters: [],
       playbookViewShown: false,
+      situationViewShown: false,
       resetPlaybookView: false,
       fileLoaded: false
     }
@@ -141,6 +146,16 @@ export default {
 
     ipcRenderer.on('show-playbook-view', function (event, arg) {
       this.playbookViewShown = !this.playbookViewShown;
+      this.situationViewShown = false;
+    }.bind(this));
+
+    ipcRenderer.on('show-situation-view', function (event, arg) {
+      this.situationViewShown = !this.situationViewShown;
+      this.playbookViewShown = false;
+
+      if (this.fileLoaded) {
+        this.$refs.situationView.processFile();
+      }
     }.bind(this));
 
     ipcRenderer.on('read-done', function (event, arg) {
@@ -424,6 +439,11 @@ export default {
 
     onHidePlaybookView: function () {
       this.playbookViewShown = false;
+    },
+
+    onHideSituationView: function () {
+      this.situationViewShown = false;
+      this.$refs.tableData.loadTable(this.selectedTable);
     }
   }
 }

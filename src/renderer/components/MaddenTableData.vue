@@ -296,9 +296,7 @@ export default {
         this.showLoadingSpinner(true);
 
         setTimeout(function () {
-          this.$options.tableData = TempDbUtil.getTable(data);
-          this.tableHasData = this.$options.tableData && this.$options.tableData.fields[0].records.length > 0;
-          this.setTableData(this.$options.tableData, true);
+          this.loadTable(data);
         }.bind(this), 10);
       }
     },
@@ -317,6 +315,12 @@ export default {
   },
 
   methods: {
+    loadTable: function (data) {
+      this.$options.tableData = TempDbUtil.getTable(data);
+      this.tableHasData = this.$options.tableData && this.$options.tableData.fields[0].records.length > 0;
+      this.setTableData(this.$options.tableData, true);
+    },
+
     showLoadingSpinner: function (show) {
       if (show) {
         this.$refs.loadingSpinner.classList.remove('hide');
@@ -516,6 +520,7 @@ export default {
         
         const changesWithMeta = changes.map(function ([row, prop, oldValue, newValue]) {
           const meta = this.hotRef.getCellMeta(row, prop);
+          
           return {
             recordNumber: meta.recordNumber, 
             column: prop, 

@@ -39,6 +39,10 @@ export default {
     }
   },
 
+  mounted() {
+    ipcRenderer.send('load-file', 'C:\\Users\\Matt\\Downloads\\Madden_49ers.DB');
+  },
+
   computed: {
     recentFilesByDate: function () {
       return this.recentFiles.sort((a, b) => { return b.time - a.time }).slice(0, this.maxRecentFiles)

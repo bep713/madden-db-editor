@@ -25,7 +25,7 @@ const baseWindowTitle = 'Madden DB Editor';
 let currentFilePath = '';
 let resetTitle;
 
-let menuItemIdsDependentOnFileLoaded = ['CloseFile', 'Undo', 'Redo', 'RevealInExplorer', 'ShowFilterWindow', 'ClearFilters', 'ShowPlaybookView', 'Restore'];
+let menuItemIdsDependentOnFileLoaded = ['CloseFile', 'Undo', 'Redo', 'RevealInExplorer', 'ShowFilterWindow', 'ClearFilters', 'ShowPlaybookView', 'ShowSituationView', 'Restore'];
 let menuItemIdsForSave = ['Save', 'SaveAs'];
 
 function createWindow () {
@@ -51,7 +51,7 @@ function createWindow () {
   workerWindow = new BrowserWindow({
     height: 500,
     width: 1000,
-    show: process.env.NODE_ENV === 'development',
+    // show: process.env.NODE_ENV === 'development',
   });
 
   workerWindow.loadURL(workerURL)

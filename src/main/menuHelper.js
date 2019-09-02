@@ -27,5 +27,9 @@ export default {
 
   showPlaybookView: function (menuItem, browserWindow, event) {
     browserWindow.webContents.send('show-playbook-view');
+  },
+
+  showSituationView: function (menuItem, browserWindow, event) {
+    browserWindow.webContents.send('show-situation-view');
   }
 };

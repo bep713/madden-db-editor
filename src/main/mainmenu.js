@@ -151,13 +151,19 @@ const template = [
     ]
   },
   {
-    label: 'Playbook View',
+    label: 'Editors',
     submenu: [
       {
         id: 'ShowPlaybookView',
         label: 'Toggle Playbook View',
         accelerator: 'CmdOrCtrl+Shift+P',
         click: menuHelper.showPlaybookView,
+        enabled: false
+      },
+      {
+        id: 'ShowSituationView',
+        label: 'Toggle Situation View',
+        click: menuHelper.showSituationView,
         enabled: false
       }
     ]
