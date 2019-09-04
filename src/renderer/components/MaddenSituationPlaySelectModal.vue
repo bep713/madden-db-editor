@@ -24,11 +24,14 @@
 <script>
 export default {
   name: 'MaddenSituationPlaySelectModal',
-  props: ['plays', 'playToReplace'],
+  props: ['plays', 'playToReplace', 'playBlacklist'],
 
   computed: {
     sortedPlays: function () {
       return this.plays.filter((play) => {
+        if (this.playBlacklist.find((blacklistPlay) => { return play.name === blacklistPlay.name && play.setl.name === blacklistPlay.setl.name; }) != null) {
+          return false;
+        }
         if (this.playSearch) {
           const playFullName = play.setl.name + ' ' + play.name;
           return playFullName.toLowerCase().indexOf(this.playSearch.toLowerCase()) >= 0;

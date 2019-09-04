@@ -24,11 +24,13 @@
     <div class="hot-container"> 
       <hot-table :settings="hotSettings" ref="hot"></hot-table>
     </div>
+    
+
   </div>
   <MaddenSituationMassEditorModal v-if="isMassEditModalOpen" v-bind:selectedSituation="selectedSituation.name" 
     @closed="onMassEditorModalClosed" @prct-edit="onPrctEdit"></MaddenSituationMassEditorModal>
   <MaddenSituationPlaySelectModal v-if="isPlaySelectOpen" v-bind:plays="plays" v-bind:playToReplace="playToReplace"
-    @closed="onPlaySelectClosed" @replace="onPlayReplace"></MaddenSituationPlaySelectModal>
+    v-bind:playBlacklist="filteredPlays" @closed="onPlaySelectClosed" @replace="onPlayReplace"></MaddenSituationPlaySelectModal>
 </div>
 </template>
 
@@ -123,7 +125,7 @@ export default {
             'replace_play': {
               'name': 'Replace play',
               'callback': function (_, coords) {
-                this.replacePlay(coords);
+                this.replacePlay(coords[0].start.row);
               }.bind(this),
               'disabled': function () {
                 const coordinates = this.getSelected()[0];
@@ -162,12 +164,14 @@ export default {
     this.hotRef = this.$refs.hot.hotInstance;
     window.addEventListener('resize', this.onResize);
     window.addEventListener('keydown', this.showMassEditor);
+    window.addEventListener('keydown', this.showPlaySelect);
     this.onResize();
   },
 
   destroyed() {
     window.removeEventListener('resize', this.onResize);
     window.removeEventListener('keydown', this.showMassEditor);
+    window.removeEventListener('keydown', this.showPlaySelect);
 
     if (this.$refs.hot) {
       this.$refs.hot.hotInstance.destroy();
@@ -296,6 +300,14 @@ export default {
           'pbplRecord': play.pbplRecord,
           'pbai': play.pbaiData.find((pbai) => { return situation.aigr.includes(pbai.aigr); })
         };
+      }).sort((a, b) => {
+        if (a.setl.name > b.setl.name) return 1;
+        else if (a.setl.name < b.setl.name) return -1;
+        else {
+          if (a.name > b.name) return 1;
+          else if (a.name < b.name) return -1;
+          else return 0;
+        }
       });
 
       const hot = this.$refs.hot.hotInstance;
@@ -547,6 +559,12 @@ export default {
       }
     },
 
+    showPlaySelect: function (e) {
+      if (e.key === 'd' && e.ctrlKey) {
+        this.replacePlay(this.$refs.hot.hotInstance.getSelected()[0][0]);
+      }
+    },
+
     onPrctEdit: function (data) {
       this.onMassEditorModalClosed();
 
@@ -655,8 +673,8 @@ export default {
       TempDbUtil.writeTable('PBAI', this.$options.pbaiTable);
     },
 
-    replacePlay: function (coords) {
-      this.rowToReplace = coords[0].start.row;
+    replacePlay: function (row) {
+      this.rowToReplace = row;
       this.playToReplace = this.filteredPlays[this.rowToReplace];
       this.$refs.hot.hotInstance.deselectCell();
       this.isPlaySelectOpen = true;
