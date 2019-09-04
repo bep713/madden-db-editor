@@ -7,7 +7,38 @@ $breakpoint-xlg: 1420px;
 $filter-text-color: #e2e2e2;
 $active-filters-primary-color: gray;
 
-.mass-editor-modal {
+.editor-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  list-style-type: none;
+  padding: 0;
+  text-align: center;
+
+  li {
+    color: white;
+    border: 1px solid orange;
+    padding: 15px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: darken($modal-background-color, 5%);
+    }
+
+    &.selected {
+      background-color: $primary-color; 
+    }
+
+    + li {
+      border-left: none;
+    }
+  }
+}
+
+.editor {
+  margin-top: 25px;
+}
+
+.modal-sm {
   font-family: 'Roboto', sans-serif;
 
   .edit-text {
@@ -117,6 +148,24 @@ $active-filters-primary-color: gray;
       + button {
         margin-left: 10px;
       }
+    }
+  }
+}
+
+.global-percent-wrapper {
+  display: flex;
+  align-items: center;
+
+  .percent {
+    flex-grow: 2;
+  }
+
+  .footer-items {
+    margin-top: 25px;
+    margin-left: 10px;
+
+    button {
+      padding: 13px;
     }
   }
 }

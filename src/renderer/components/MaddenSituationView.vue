@@ -7,7 +7,7 @@
   <div class="main-header-wrapper">
     <h2 class="main-header">Situation View</h2>
     <div class="action-links">
-      <div class="mass-editors action-link" v-on:click="onMassEditorsClicked">PRCT Global Editor</div>
+      <div class="mass-editors action-link" v-on:click="onMassEditorsClicked">PRCT Editor</div>
       <div class="back-to-db-editor action-link" v-on:click="onBackToDbEditorClick">Back to DB Editor</div>
     </div>
   </div>
@@ -27,6 +27,8 @@
   </div>
   <MaddenSituationMassEditorModal v-if="isMassEditModalOpen" v-bind:selectedSituation="selectedSituation.name" 
     @closed="onMassEditorModalClosed" @prct-edit="onPrctEdit"></MaddenSituationMassEditorModal>
+  <MaddenSituationPlaySelectModal v-if="isPlaySelectOpen" v-bind:plays="plays" v-bind:playToReplace="playToReplace"
+    @closed="onPlaySelectClosed" @replace="onPlayReplace"></MaddenSituationPlaySelectModal>
 </div>
 </template>
 
@@ -47,13 +49,15 @@ import FieldTypes from '../utils/FieldTypeEnum';
 import PlayTypeData from '../utils/PlayTypeData';
 import SituationData from '../utils/SituationData';
 import MaddenSituationMassEditorModal from './MaddenSituationMassEditorModal';
+import MaddenSituationPlaySelectModal from './MaddenSituationPlaySelectModal';
 
 export default {
   name: 'MaddenSituationView',
   props: ['resetPlaybookView', 'fileLoaded'],
   components: {
     HotTable,
-    MaddenSituationMassEditorModal
+    MaddenSituationMassEditorModal,
+    MaddenSituationPlaySelectModal
   },
   data () {
     return {
@@ -75,21 +79,24 @@ export default {
       isPlaybook: true,
       isCustomPlaybook: false,
       isMassEditModalOpen: false,
+      isPlaySelectOpen: false,
+      playToReplace: null,
+      rowToReplace: null,
       hotMetadata: {
         'advancedPLYT': false,
         'columns': {
           'simplePlyt': [
             { data: 'pbpl','readOnly': true },
-            { data: 'pbai.setl.name','readOnly': true },
+            { data: 'setl.name','readOnly': true },
             { data: 'name','readOnly': true },
-            { data: 'pbai.plyt.name','readOnly': true },
+            { data: 'plyt.name','readOnly': true },
             { data: 'pbai.prct' }
           ],
           'advancedPlyt': [
             { data: 'pbpl','readOnly': true },
-            { data: 'pbai.setl.name','readOnly': true },
+            { data: 'setl.name','readOnly': true },
             { data: 'name','readOnly': true },
-            { data: 'pbai.plyt.id','readOnly': true },
+            { data: 'plyt.id','readOnly': true },
             { data: 'pbai.prct' }
           ]
         }
@@ -101,9 +108,9 @@ export default {
         'currentRowClassName': 'active-row',
         'columns': [
           { data: 'pbpl','readOnly': true },
-          { data: 'pbai.setl.name','readOnly': true },
+          { data: 'setl.name','readOnly': true },
           { data: 'name','readOnly': true },
-          { data: 'pbai.plyt.name','readOnly': true },
+          { data: 'plyt.name','readOnly': true },
           { data: 'pbai.prct' }
         ],
         'colHeaders': ['pbpl', 'formation/set', 'play name', 'play type', 'prct'],
@@ -113,6 +120,16 @@ export default {
         'columnSorting': true,
         'contextMenu': {
           'items': {
+            'replace_play': {
+              'name': 'Replace play',
+              'callback': function (_, coords) {
+                this.replacePlay(coords);
+              }.bind(this),
+              'disabled': function () {
+                const coordinates = this.getSelected()[0];
+                return !(coordinates[0] === coordinates[2] && coordinates[1] === coordinates[3]);
+              }
+            },
             'advanced_plyt': {
               'name': 'Toggle advanced play type',
               'callback': function () {
@@ -274,6 +291,8 @@ export default {
         return {
           'name': play.name,
           'pbpl': play.pbpl,
+          'setl': play.setl,
+          'plyt': play.plyt,
           'pbplRecord': play.pbplRecord,
           'pbai': play.pbaiData.find((pbai) => { return situation.aigr.includes(pbai.aigr); })
         };
@@ -340,11 +359,38 @@ export default {
 
       for (let i = 0; i < this.$options.pbplTable.fields[0].records.length; i++) {
         const name = this.$options.pbplTable.fields[6].records[i].value;
+        const plyl = this.$options.pbplTable.fields[3].records[i].value;
+        const flag = this.$options.pbplTable.fields[7].records[i].value;
+        const plylIndex = this.$options.plylTable.fields[1].records.findIndex((record) => {
+          return record.value === plyl;
+        });
+
+        const setl = this.$options.plylTable.fields[0].records[plylIndex].value;
+        const plyt = this.$options.plylTable.fields[4].records[plylIndex].value;
+        const plf_ = this.$options.plylTable.fields[5].records[plylIndex].value;
+        const vpos = this.$options.plylTable.fields[10].records[plylIndex].value;
+
+        let plytValue = {
+          'name': '',
+          'id': plyt
+        };
+
+        const plytRecord = PlayTypeData.find((playType) => { return playType.plyt.includes(plyt); });
+
+        if (plytRecord) {
+          plytValue.name = plytRecord.name;
+        }
         
         this.plays.push({
           'name': name.trim(),
-          'plyl': this.$options.pbplTable.fields[3].records[i].value,
+          'plyl': plyl,
+          'plylRecord': plylIndex,
           'pbpl': this.$options.pbplTable.fields[2].records[i].value,
+          'setl': this.setNames.find((set) => { return set.setl === setl; }),
+          'plyt': plytValue,
+          'plf_': plf_,
+          'vpos': vpos,
+          'flag': flag,
           'pbplRecord': i,
           'pbaiData': [],
         });
@@ -359,31 +405,18 @@ export default {
 
       for (let i = 0; i < pbai.fields[0].records.length; i++) {
         const pbpl = pbai.fields[0].records[i].value;
-        const setl = pbai.fields[1].records[i].value;
         const aigr = pbai.fields[2].records[i].value;
-        const plyt = pbai.fields[3].records[i].value;
         const prct = pbai.fields[7].records[i].value;
 
         const play = this.plays.find((play) => {
           return play.pbpl === pbpl;
         });
 
-        let plytValue = {
-          'name': '',
-          'id': plyt
-        };
-
-        const plytRecord = PlayTypeData.find((playType) => { return playType.plyt.includes(plyt); });
-
-        if (plytRecord) {
-          plytValue.name = plytRecord.name;
-        }
-
         play.pbaiData.push({
           'pbaiRecord': i,
-          'setl': this.setNames.find((set) => { return set.setl === setl; }),
+          'setl': play.setl,
           'aigr': aigr,
-          'plyt': plytValue,
+          'plyt': play.plyt,
           'prct': prct
         });
       }
@@ -474,6 +507,7 @@ export default {
 
     onMassEditorsClicked: function () {
       this.isMassEditModalOpen = true;
+      this.$refs.hot.hotInstance.deselectCell();
     },
 
     processChanges: function (changes) {
@@ -520,6 +554,37 @@ export default {
         data: null
       });
 
+      if (data.prct) {
+        this.editGlobalPlays(data);
+      }
+      else {
+        this.editSituationalPlays(data);
+      }
+    },
+
+    editGlobalPlays: function (data) {
+      this.plays.forEach((play) => {
+        play.pbaiData.forEach((pbai) => {
+          pbai.prct = data.prct;
+        });
+      });
+
+      this.selectSituation(this.selectedSituation);
+
+      const changes = [].concat.apply([], this.plays.map((play, index) => {
+        return play.pbaiData.map((pbai) => {
+          return {
+            'recordNumber': pbai.pbaiRecord,
+            'column': 7,
+            'value': pbai.prct
+          };
+        });
+      }));
+
+      this.save(changes);
+    },
+
+    editSituationalPlays: function (data) {
       this.filteredPlays.forEach((play) => {
         switch (play.pbai.plyt.name) {
           case 'Pass':
@@ -588,6 +653,59 @@ export default {
       });
 
       TempDbUtil.writeTable('PBAI', this.$options.pbaiTable);
+    },
+
+    replacePlay: function (coords) {
+      this.rowToReplace = coords[0].start.row;
+      this.playToReplace = this.filteredPlays[this.rowToReplace];
+      this.$refs.hot.hotInstance.deselectCell();
+      this.isPlaySelectOpen = true;
+    },
+
+    onPlayReplace: function (play) {
+      this.onPlaySelectClosed();
+      this.$refs.hot.hotInstance.updateSettings({
+        data: null
+      });
+
+      const pbaiRecordToReplace = this.playToReplace.pbai.pbaiRecord;
+
+      let playToReplace = this.plays.find((play) => {
+        return play.pbpl === this.playToReplace.pbpl;
+      });
+
+      const indexToRemove = playToReplace.pbaiData.findIndex((pbai) => { return this.selectedSituation.aigr.includes(pbai.aigr) });
+      playToReplace.pbaiData.splice(indexToRemove);
+
+      play.pbaiData.push({
+        'aigr': this.playToReplace.pbai.aigr,
+        'pbaiRecord': pbaiRecordToReplace,
+        'prct': this.playToReplace.pbai.prct,
+        'plyt': play.plyt,
+        'setl': play.setl
+      });
+
+      const changes = [
+        {'column': 0, 'recordNumber': pbaiRecordToReplace, 'value': play.pbpl},
+        {'column': 1, 'recordNumber': pbaiRecordToReplace, 'value': play.setl.setl},
+        {'column': 3, 'recordNumber': pbaiRecordToReplace, 'value': play.plyt.id},
+        {'column': 4, 'recordNumber': pbaiRecordToReplace, 'value': play.plf_},
+        {'column': 5, 'recordNumber': pbaiRecordToReplace, 'value': play.flag},
+        {'column': 6, 'recordNumber': pbaiRecordToReplace, 'value': play.vpos},
+      ];
+      
+      this.selectSituation(this.selectedSituation);
+      this.save(changes);
+
+      const newIndex = this.filteredPlays.findIndex((filteredPlay) => {
+        return filteredPlay.pbpl === play.pbpl;
+      });
+
+      this.$refs.hot.hotInstance.selectCell(newIndex, 0);
+    },
+
+    onPlaySelectClosed: function () {
+      this.isPlaySelectOpen = false;
     }
   }
 }
