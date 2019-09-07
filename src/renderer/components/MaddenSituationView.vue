@@ -24,8 +24,7 @@
     <div class="hot-container"> 
       <hot-table :settings="hotSettings" ref="hot"></hot-table>
     </div>
-    
-
+    <MaddenSituationViewStats v-bind:plays="plays" v-bind:selectedSituation="selectedSituation" v-bind:playsInSituation="filteredPlays"></MaddenSituationViewStats>
   </div>
   <MaddenSituationMassEditorModal v-if="isMassEditModalOpen" v-bind:selectedSituation="selectedSituation.name" 
     @closed="onMassEditorModalClosed" @prct-edit="onPrctEdit"></MaddenSituationMassEditorModal>
@@ -627,16 +626,24 @@ export default {
       this.filteredPlays.forEach((play) => {
         switch (play.pbai.plyt.name) {
           case 'Pass':
-            play.pbai.prct = data.pass;
+            if (data.pass) {
+              play.pbai.prct = data.pass;
+            }
             break;
           case 'Run':
-            play.pbai.prct = data.run;
+            if (data.run) {
+              play.pbai.prct = data.run;
+            }
             break;
           case 'Play action':
-            play.pbai.prct = data.pa;
+            if (data.pa) {
+              play.pbai.prct = data.pa;
+            }
             break;
           case 'RPO':
-            play.pbai.prct = data.rpo;
+            if (data.rpo) {
+              play.pbai.prct = data.rpo;
+            }
             break;
         }
       });
