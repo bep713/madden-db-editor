@@ -1,7 +1,7 @@
 <template>
   <div class="situation-stats-wrapper">
     <div class="play-count-wrapper stat-group">
-      <div class="stat-group-title">Play count by type - {{selectedSituation.name}}</div>
+      <div class="stat-group-title">Play count by type</div>
       <div class="stats">
         <div class="pass stat">
           <span class="stat-title">Pass</span>
@@ -21,6 +21,15 @@
         </div>
       </div>
     </div>
+    <div class="stat-group vpos-stats">
+      <div class="stat-group-title">Target breakdown</div>
+      <div class="stats">
+        <div v-for="(target, index) in targets" v-bind:key="index" class="stat">
+          <span class="stat-title">{{index}}</span>
+          <span class="stat-number">{{target}}</span>
+        </div>
+      </div>
+    </div>
     <div class="stat-group unused-plays">
       <div class="stat-group-title">Unused plays in playbook</div>
       <div class="stats">
@@ -31,14 +40,19 @@
 </template>
 
 <style lang="scss">
-  .play-count-wrapper {
-    .stat {
-      display: grid;
-      grid-template-columns: 75px 1fr;
-       
-      + .stat {
-        margin-top: 5px;
-      }
+  .situation-stats-wrapper {
+    display: grid;
+    grid-template-rows: 205px 1fr;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 15px;
+  }
+
+  .stat {
+    display: grid;
+    grid-template-columns: 75px 1fr;
+      
+    + .stat {
+      margin-top: 5px;
     }
   }
 
@@ -50,15 +64,13 @@
   .stat-group {
     background: #FFF;
     padding: 10px;
-
-    + .stat-group {
-      margin-top: 15px;
-    }
   }
 
   .unused-plays {
+    grid-column: 1 / 3;
+
     .stats {
-      max-height: calc(100vh - 318px);
+      max-height: calc(100vh - 373px);
       overflow-y: auto;
     }
 
@@ -106,6 +118,30 @@ export default {
       return this.plays.filter((play) => {
         return play.pbaiData.length === 0;
       });
+    },
+
+    targets: function () {
+      return this.situationPlays.reduce((accum, cur) => {
+        let mappedVpos;
+
+        switch(cur.vpos) {
+          case 0: mappedVpos = 'QB'; break;
+          case 1: mappedVpos = 'HB'; break;
+          case 2: mappedVpos = 'SLWR'; break;
+          case 3: mappedVpos = 'LWR'; break;
+          case 4: mappedVpos = 'RWR'; break;
+          case 5: mappedVpos = 'TE'; break;
+        }
+
+        if (accum[mappedVpos]) {
+          accum[mappedVpos] = accum[mappedVpos] + 1;
+        }
+        else {
+          accum[mappedVpos] = 1;
+        }
+        
+        return accum;
+      }, {'QB': 0, 'HB': 0, 'SLWR': 0, 'LWR': 0, 'RWR': 0, 'TE': 0});
     }
   },
 
@@ -119,13 +155,14 @@ export default {
 
   methods: {
     getNumberOfPlaysByType(type) {
-      const meta = PlayTypeData.find((playType) => { return playType.name === type; });
-      return this.situationPlays.filter((play) => { return meta.plyt.includes(play.plyt.id); }).length;
+      if (PlayTypeData) {
+        const meta = PlayTypeData.find((playType) => { return playType.name === type; });
+        return this.situationPlays.filter((play) => { return meta.plyt.includes(play.plyt.id); }).length;
+      }
+      else {
+        return null;
+      }
     }
   }
 }
-
-  function newFunction() {
-    
-  }
 </script>

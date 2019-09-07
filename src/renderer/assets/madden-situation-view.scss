@@ -1,7 +1,11 @@
 .situation-view-wrapper {
+  .main-header-wrapper {
+    background-color: #fff;
+  }
+
   .tables-wrapper {
     grid-template-rows: 1fr;
-    grid-template-columns: 300px 960px minmax(200px, 1fr);
+    grid-template-columns: 300px 960px minmax(400px, 1fr);
   }
 
   .table-wrapper {

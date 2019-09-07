@@ -153,6 +153,7 @@ export default {
       this.situationViewShown = !this.situationViewShown;
 
       if (this.situationViewShown) {
+        document.body.style.backgroundColor = '#eee';
         this.playbookViewShown = false;
 
         if (this.fileLoaded) {
@@ -448,6 +449,7 @@ export default {
     },
 
     onHideSituationView: function () {
+      document.body.style.backgroundColor = '#fff';
       this.situationViewShown = false;
       this.$refs.tableData.loadTable(this.selectedTable);
     }

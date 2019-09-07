@@ -174,6 +174,7 @@ export default {
     window.addEventListener('resize', this.onResize);
     window.addEventListener('keydown', this.showMassEditor);
     window.addEventListener('keydown', this.showPlaySelect);
+
     this.onResize();
   },
 
@@ -232,7 +233,6 @@ export default {
       this.plays = [];
       this.isPlaybook = TempDbUtil.fileIsPlaybook();
       this.isCustomPlaybook = TempDbUtil.fileIsCustomPlaybook();
-
 
       if (this.isPlaybook) {
         this.parseTable('SETL', 'setTable');
