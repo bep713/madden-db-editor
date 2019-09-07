@@ -129,6 +129,7 @@ export default {
             'replace_play': {
               'name': 'Replace play',
               'callback': function (_, coords) {
+                console.log(coords);
                 this.replacePlay(coords[0].start.row);
               }.bind(this),
               'disabled': function () {
@@ -159,7 +160,7 @@ export default {
           'id': index,
           'name': situation.name,
           'aigr': situation.aigr,
-          'totalPlays': this.plays.filter((play) => { 
+          'totalPlays': this.plays.filter((play) => {
             return play.pbaiData.find((pbai) => { 
               return situation.aigr.includes(pbai.aigr); 
             });
@@ -723,7 +724,7 @@ export default {
       });
 
       const indexToRemove = playToReplace.pbaiData.findIndex((pbai) => { return this.selectedSituation.aigr.includes(pbai.aigr) });
-      playToReplace.pbaiData.splice(indexToRemove);
+      playToReplace.pbaiData.splice(indexToRemove, 1);
 
       play.pbaiData.push({
         'aigr': this.playToReplace.pbai.aigr,
@@ -742,6 +743,7 @@ export default {
         {'column': 6, 'recordNumber': pbaiRecordToReplace, 'value': play.vpos},
       ];
       
+      console.log(this.situationNames);
       this.selectSituation(this.selectedSituation);
       this.save(changes);
 
