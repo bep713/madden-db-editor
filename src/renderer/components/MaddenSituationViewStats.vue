@@ -1,7 +1,7 @@
 <template>
   <div class="situation-stats-wrapper">
     <div class="play-count-wrapper stat-group">
-      <div class="stat-group-title">Play count by type</div>
+      <div class="stat-group-title">Play count by type - {{selectedSituation.name}}</div>
       <div class="stats">
         <div class="pass stat">
           <span class="stat-title">Pass</span>
