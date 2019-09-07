@@ -16,8 +16,14 @@
   <div class="tables-wrapper" v-if="isPlaybook" ref="wrapper">
     <div class="set-table-wrapper table-wrapper">
       <div class="set-name-table table">
-        <div class="set table-item" v-bind:class="{ active: selectedSituation ? selectedSituation.id === situation.id : null }" v-for="situation in situationNames" 
-          v-bind:key="situation.id" v-on:click="selectSituation(situation)">{{situation.name}} ({{situation.totalPlays}})</div>
+        <draggable v-model="situationNames" v-bind="dragOptions" @start="drag = true" @end="drag = false">
+          <transition-group type="transition" :name="!drag ? 'flip-list' : null">
+            <div class="set table-item" v-bind:class="{ active: selectedSituation ? selectedSituation.id === situation.id : null, 'no-hover': drag }" v-for="situation in situationNames" 
+              v-bind:key="situation.id" v-on:click="selectSituation(situation)" @click="situation.fixed = !situation.fixed">
+              {{situation.name}} ({{situationCount.find((situationData) => { return situationData.id === situation.id; }).totalPlays}})
+            </div>
+          </transition-group>
+        </draggable>
       </div>
     </div>
 
@@ -40,6 +46,7 @@
 import fs from 'fs';
 import Vue from 'vue';
 import path from 'path';
+import draggable from 'vuedraggable';
 import { ipcRenderer } from 'electron';
 import Handsontable from 'handsontable';
 import HexReader from '../utils/HexReader';
@@ -58,6 +65,7 @@ export default {
   props: ['resetPlaybookView', 'fileLoaded'],
   components: {
     HotTable,
+    draggable,
     MaddenSituationMassEditorModal,
     MaddenSituationPlaySelectModal,
     MaddenSituationViewStats
@@ -79,12 +87,14 @@ export default {
       plrr: null,
       vpos: null,
       artl: null,
+      situationNames: [],
       isPlaybook: true,
       isCustomPlaybook: false,
       isMassEditModalOpen: false,
       isPlaySelectOpen: false,
       playToReplace: null,
       rowToReplace: null,
+      drag: false,
       hotMetadata: {
         'advancedPLYT': false,
         'columns': {
@@ -129,7 +139,6 @@ export default {
             'replace_play': {
               'name': 'Replace play',
               'callback': function (_, coords) {
-                console.log(coords);
                 this.replacePlay(coords[0].start.row);
               }.bind(this),
               'disabled': function () {
@@ -154,8 +163,37 @@ export default {
   },
 
   computed: {
-    situationNames: function () {
+    situationCount: function () {
       return SituationData.map((situation, index) => {
+        return {
+          'id': index,
+          'totalPlays': this.plays.filter((play) => {
+            return play.pbaiData.find((pbai) => { 
+              return situation.aigr.includes(pbai.aigr); 
+            });
+          }).length
+        }
+      });
+    },
+
+    dragOptions() {
+      return {
+        animation: 200,
+        group: "description",
+        disabled: false,
+        ghostClass: "ghost"
+      };
+    }
+  },
+
+  mounted() {
+    this.hotRef = this.$refs.hot.hotInstance;
+    window.addEventListener('resize', this.onResize);
+    window.addEventListener('keydown', this.showMassEditor);
+    window.addEventListener('keydown', this.showPlaySelect);
+
+    this.onResize();
+    this.situationNames = SituationData.map((situation, index) => {
         return {
           'id': index,
           'name': situation.name,
@@ -167,16 +205,6 @@ export default {
           }).length
         }
       });
-    }
-  },
-
-  mounted() {
-    this.hotRef = this.$refs.hot.hotInstance;
-    window.addEventListener('resize', this.onResize);
-    window.addEventListener('keydown', this.showMassEditor);
-    window.addEventListener('keydown', this.showPlaySelect);
-
-    this.onResize();
   },
 
   destroyed() {
@@ -743,7 +771,6 @@ export default {
         {'column': 6, 'recordNumber': pbaiRecordToReplace, 'value': play.vpos},
       ];
       
-      console.log(this.situationNames);
       this.selectSituation(this.selectedSituation);
       this.save(changes);
 

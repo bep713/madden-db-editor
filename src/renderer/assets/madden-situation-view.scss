@@ -16,6 +16,22 @@
     overflow: auto;
   }
 
+  .table-item {
+    &:hover {
+      background-color: lighten(#d1d1d1, 10%);
+
+      &.active {
+        background-color: #d1d1d1;
+      }
+    }
+
+    &.no-hover {
+      &:hover {
+        background-color: inherit;
+      }
+    }
+  }
+
   .action-links {
     display: flex;
 
@@ -34,4 +50,17 @@
       }
     }
   }
+}
+
+.ghost {
+  opacity: 0.5;
+  background: #d1d1d1;
+}
+
+.flip-list-move {
+  transition: transform 0.5s;
+}
+
+.no-move {
+  transition: transform 0s;
 }
