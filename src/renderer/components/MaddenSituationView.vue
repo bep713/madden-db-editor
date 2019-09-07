@@ -92,13 +92,15 @@ export default {
             { data: 'setl.name','readOnly': true },
             { data: 'name','readOnly': true },
             { data: 'plyt.name','readOnly': true },
-            { data: 'pbai.prct' }
+            { data: 'vpos', 'readOnly': true },
+            { data: 'pbai.prct' },
           ],
           'advancedPlyt': [
             { data: 'pbpl','readOnly': true },
             { data: 'setl.name','readOnly': true },
             { data: 'name','readOnly': true },
             { data: 'plyt.id','readOnly': true },
+            { data: 'vpos', 'readOnly': true },
             { data: 'pbai.prct' }
           ]
         }
@@ -113,12 +115,13 @@ export default {
           { data: 'setl.name','readOnly': true },
           { data: 'name','readOnly': true },
           { data: 'plyt.name','readOnly': true },
+          { data: 'vpos', 'readOnly': true },
           { data: 'pbai.prct' }
         ],
-        'colHeaders': ['pbpl', 'formation/set', 'play name', 'play type', 'prct'],
+        'colHeaders': ['pbpl', 'formation/set', 'play name', 'play type', 'vpos', 'prct'],
         'colWidths': [85, 300, 300, 125, 75],
         'afterChange': this.processChanges,
-        'width': 910,
+        'width': 960,
         'columnSorting': true,
         'contextMenu': {
           'items': {
@@ -158,7 +161,7 @@ export default {
           'totalPlays': this.plays.filter((play) => { 
             return play.pbaiData.find((pbai) => { 
               return situation.aigr.includes(pbai.aigr); 
-            })
+            });
           }).length
         }
       });
@@ -304,6 +307,7 @@ export default {
           'setl': play.setl,
           'plyt': play.plyt,
           'pbplRecord': play.pbplRecord,
+          'vpos': play.vpos,
           'pbai': play.pbaiData.find((pbai) => { return situation.aigr.includes(pbai.aigr); })
         };
       }).sort((a, b) => {
