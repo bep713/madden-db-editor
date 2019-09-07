@@ -3,7 +3,7 @@
     <!-- <div class="app-brand"></div> -->
     <div class="app-title">
       <h1>Madden DB Editor</h1>
-      <span class="version">v1.1.1</span>
+      <span class="version">v1.1.2</span>
     </div>
     <div class="welcome-header">
       <h1>Start</h1>
