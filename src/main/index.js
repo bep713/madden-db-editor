@@ -51,7 +51,7 @@ function createWindow () {
   workerWindow = new BrowserWindow({
     height: 500,
     width: 1000,
-    // show: process.env.NODE_ENV === 'development',
+    show: process.env.NODE_ENV === 'development'
   });
 
   workerWindow.loadURL(workerURL)

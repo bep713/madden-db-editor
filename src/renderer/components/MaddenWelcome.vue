@@ -3,7 +3,7 @@
     <!-- <div class="app-brand"></div> -->
     <div class="app-title">
       <h1>Madden DB Editor</h1>
-      <span class="version">v1.0 BETA</span>
+      <span class="version">v1.1.1</span>
     </div>
     <div class="welcome-header">
       <h1>Start</h1>
@@ -40,7 +40,7 @@ export default {
   },
 
   mounted() {
-    ipcRenderer.send('load-file', 'C:\\Users\\Matt\\Downloads\\Madden_49ers.DB');
+    // ipcRenderer.send('load-file', 'C:\\Users\\Matt\\Downloads\\Madden_49ers.DB');
   },
 
   computed: {

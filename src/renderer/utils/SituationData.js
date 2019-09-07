@@ -40,36 +40,28 @@ export default [
     "aigr": [31]
   },
   {
-    "name": "All 4 Verts?",
-    "aigr": [23]
-  },
-  {
-    "name": "All Play Action?",
-    "aigr": [37]
-  },
-  {
-    "name": "Chew Clock",
-    "aigr": [13]
-  },
-  {
-    "name": "Fake FG",
-    "aigr": [12]
-  },
-  {
-    "name": "Fake Punt",
-    "aigr": [11]
-  },
-  {
-    "name": "Field Goal",
-    "aigr": [0, 38]
+    "name": "Redzone",
+    "aigr": [4]
   },
   {
     "name": "Four Minute Offense",
     "aigr": [24]
   },
   {
+    "name": "Two Minute Offense",
+    "aigr": [10]
+  },
+  {
     "name": "Go for 2",
     "aigr": [34]
+  },
+  {
+    "name": "Inside the Five",
+    "aigr": [5]
+  },
+  {
+    "name": "Chew Clock",
+    "aigr": [13]
   },
   {
     "name": "Goal Line",
@@ -80,47 +72,55 @@ export default [
     "aigr": [22]
   },
   {
+    "name": "All Play Action?",
+    "aigr": [37]
+  },
+  {
+    "name": "All 4 Verts?",
+    "aigr": [23]
+  },
+  {
     "name": "Hail Mary",
     "aigr": [21]
-  },
-  {
-    "name": "Inside the Five",
-    "aigr": [5]
-  },
-  {
-    "name": "Kickoff",
-    "aigr": [15, 36]
-  },
-  {
-    "name": "Onside",
-    "aigr": [16]
   },
   {
     "name": "Punt",
     "aigr": [9]
   },
   {
+    "name": "Fake Punt",
+    "aigr": [11]
+  },
+  {
+    "name": "Fake FG",
+    "aigr": [12]
+  },
+  {
     "name": "Punt Tight",
     "aigr": [19]
   },
   {
-    "name": "QB Kneel",
-    "aigr": [14]
-  },
-  {
-    "name": "Redzone",
-    "aigr": [4]
+    "name": "Onside",
+    "aigr": [16]
   },
   {
     "name": "Safety Kickoff",
     "aigr": [18]
   },
   {
-    "name": "Stop Clock",
-    "aigr": [2, 29, 30]
+    "name": "Field Goal",
+    "aigr": [0, 38]
   },
   {
-    "name": "Two Minute Offense",
-    "aigr": [10]
+    "name": "Kickoff",
+    "aigr": [15, 36]
+  },
+  {
+    "name": "QB Kneel",
+    "aigr": [14]
+  },
+  {
+    "name": "Stop Clock",
+    "aigr": [2, 29, 30]
   }
 ]

@@ -121,6 +121,9 @@ module.exports = {
     }, {
       "value": 132,
       "recordNumber": 31
+    }, {
+      "value": 102,
+      "recordNumber": 32
     }]
   }, {
     "type": 3,
@@ -223,6 +226,9 @@ module.exports = {
     }, {
       "value": 1,
       "recordNumber": 31
+    }, {
+      "value": 1,
+      "recordNumber": 32
     }]
   }, {
     "type": 0,
@@ -325,6 +331,9 @@ module.exports = {
     }, {
       "value": "Hail Mary",
       "recordNumber": 31
+    }, {
+      "value": "Power I",
+      "recordNumber": 32
     }]
   }]
 }

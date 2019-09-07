@@ -154,7 +154,8 @@ export default {
         return {
           'id': index,
           'name': situation.name,
-          'aigr': situation.aigr
+          'aigr': situation.aigr,
+          'totalPlays': this.plays.filter((play) => { return play.pbaiData.find((pbai) => { situation.aigr.includes(pbai.aigr); })}).length
         }
       });
     }
@@ -223,6 +224,7 @@ export default {
       this.plays = [];
       this.isPlaybook = TempDbUtil.fileIsPlaybook();
       this.isCustomPlaybook = TempDbUtil.fileIsCustomPlaybook();
+
 
       if (this.isPlaybook) {
         this.parseTable('SETL', 'setTable');
@@ -392,13 +394,24 @@ export default {
         if (plytRecord) {
           plytValue.name = plytRecord.name;
         }
+
+        let setlValue = this.setNames.find((set) => { return set.setl === setl; });
+
+        if (!setlValue) {
+          setlValue = {
+            'id': '9999',
+            'name': 'Unknown',
+            'type': 0,
+            'setl': 0
+          }
+        }
         
         this.plays.push({
           'name': name.trim(),
           'plyl': plyl,
           'plylRecord': plylIndex,
           'pbpl': this.$options.pbplTable.fields[2].records[i].value,
-          'setl': this.setNames.find((set) => { return set.setl === setl; }),
+          'setl': setlValue,
           'plyt': plytValue,
           'plf_': plf_,
           'vpos': vpos,
@@ -674,7 +687,7 @@ export default {
     },
 
     replacePlay: function (row) {
-      this.rowToReplace = row;
+      this.rowToReplace = this.$refs.hot.hotInstance.toPhysicalRow(row);
       this.playToReplace = this.filteredPlays[this.rowToReplace];
       this.$refs.hot.hotInstance.deselectCell();
       this.isPlaySelectOpen = true;
