@@ -17,7 +17,7 @@
     <div class="set-table-wrapper table-wrapper">
       <div class="set-name-table table">
         <div class="set table-item" v-bind:class="{ active: selectedSituation === situation }" v-for="situation in situationNames" 
-          v-bind:key="situation.id" v-on:click="selectSituation(situation)">{{situation.name}}</div>
+          v-bind:key="situation.id" v-on:click="selectSituation(situation)">{{situation.name}} ({{situation.totalPlays}})</div>
       </div>
     </div>
 
@@ -155,7 +155,11 @@ export default {
           'id': index,
           'name': situation.name,
           'aigr': situation.aigr,
-          'totalPlays': this.plays.filter((play) => { return play.pbaiData.find((pbai) => { situation.aigr.includes(pbai.aigr); })}).length
+          'totalPlays': this.plays.filter((play) => { 
+            return play.pbaiData.find((pbai) => { 
+              return situation.aigr.includes(pbai.aigr); 
+            })
+          }).length
         }
       });
     }
