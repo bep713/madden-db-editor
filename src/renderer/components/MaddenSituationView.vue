@@ -24,7 +24,7 @@
     <div class="hot-container"> 
       <hot-table :settings="hotSettings" ref="hot"></hot-table>
     </div>
-    <MaddenSituationViewStats v-bind:plays="plays" v-bind:selectedSituation="selectedSituation" v-bind:playsInSituation="filteredPlays"></MaddenSituationViewStats>
+    <MaddenSituationViewStats v-bind:plays="plays" v-bind:selectedSituation="selectedSituation" v-bind:situationPlays="filteredPlays"></MaddenSituationViewStats>
   </div>
   <MaddenSituationMassEditorModal v-if="isMassEditModalOpen" v-bind:selectedSituation="selectedSituation.name" 
     @closed="onMassEditorModalClosed" @prct-edit="onPrctEdit"></MaddenSituationMassEditorModal>
@@ -49,6 +49,7 @@ import TempDbUtil from '../utils/TempDbUtil';
 import FieldTypes from '../utils/FieldTypeEnum';
 import PlayTypeData from '../utils/PlayTypeData';
 import SituationData from '../utils/SituationData';
+import MaddenSituationViewStats from './MaddenSituationViewStats';
 import MaddenSituationMassEditorModal from './MaddenSituationMassEditorModal';
 import MaddenSituationPlaySelectModal from './MaddenSituationPlaySelectModal';
 
@@ -58,7 +59,8 @@ export default {
   components: {
     HotTable,
     MaddenSituationMassEditorModal,
-    MaddenSituationPlaySelectModal
+    MaddenSituationPlaySelectModal,
+    MaddenSituationViewStats
   },
   data () {
     return {
