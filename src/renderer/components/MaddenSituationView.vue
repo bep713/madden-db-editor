@@ -16,7 +16,7 @@
   <div class="tables-wrapper" v-if="isPlaybook" ref="wrapper">
     <div class="set-table-wrapper table-wrapper">
       <div class="set-name-table table">
-        <div class="set table-item" v-bind:class="{ active: selectedSituation === situation }" v-for="situation in situationNames" 
+        <div class="set table-item" v-bind:class="{ active: selectedSituation ? selectedSituation.id === situation.id : null }" v-for="situation in situationNames" 
           v-bind:key="situation.id" v-on:click="selectSituation(situation)">{{situation.name}} ({{situation.totalPlays}})</div>
       </div>
     </div>
