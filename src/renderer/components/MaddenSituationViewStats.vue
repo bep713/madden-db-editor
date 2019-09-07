@@ -117,6 +117,14 @@ export default {
     unusedPlays: function () {
       return this.plays.filter((play) => {
         return play.pbaiData.length === 0;
+      }).sort((a, b) => {
+        if (a.setl.name > b.setl.name) return 1;
+        else if (a.setl.name < b.setl.name) return -1;
+        else {
+          if (a.name > b.name) return 1;
+          else if (a.name < b.name) return -1;
+          else return 0;
+        }
       });
     },
 
